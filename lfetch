@@ -51,6 +51,11 @@ get_uptime()
 	output="${hours} hours, ${minutes} minutes, ${seconds} seconds"
 }
 
+get_modules()
+{
+	output=$(cat /proc/modules | wc -l)
+}
+
 get_ptys()
 {
 	devices=$(ls -l /dev/pts | wc -l)
@@ -93,6 +98,7 @@ info "Hostname         ~ " hostname
 info "Version          ~ " version
 info "Last update date ~ " last_update_date
 info "Uptime           ~ " uptime
+info "Modules          ~ " modules
 info "Terminals open   ~ " ptys
 info "Bootloader type  ~ " bootloader
 info "Cmdline          ~ " cmdline
