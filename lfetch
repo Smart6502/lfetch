@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+# Linux fetch
+
+version=0.1.0
+
+output=""
+colour=35
+
+get_osname()
+{
+	. /etc/os-release
+	output=${PRETTY_NAME}
+}
+
+get_kernel()
+{
+	read -r output < /proc/sys/kernel/osrelease
+}
+
+get_hostname()
+{
+	read -r output < /proc/sys/kernel/hostname
+}
+
+get_version()
+{
+	read -r _ _ output _ < /proc/version
+	output=${output%%-*}
+}
+
+get_last_update_date()
+{
+	get_version
+	version=$output
+
+	page=$(curl -s "https://mirrors.edge.kernel.org/pub/linux/kernel/v${version:0:1}.x/")
+	entry=$(echo "$page" | grep $version | grep gz)
+	output=$(echo $entry | awk '{print $3}')
+}
+
+get_uptime()
+{
+	read -r seconds _ < /proc/uptime
+	seconds=${seconds/.*}
+
+	hours=$((seconds / 3600))
+	minutes=$((seconds / 60 % 60))
+	seconds=$((seconds % 60))
+
+	output="${hours} hours, ${minutes} minutes, ${seconds} seconds"
+}
+
+get_ptys()
+{
+	devices=$(ls -l /dev/pts | wc -l)
+	output=$((devices - 2))
+}
+
+get_cmdline()
+{
+	read -r output < /proc/cmdline
+}
+
+get_bootloader()
+{
+	read -r bootloader_type < /proc/sys/kernel/bootloader_type
+	read -r bootloader_version < /proc/sys/kernel/bootloader_version
+
+	output="${bootloader_type} v.${bootloader_version}"
+}
+
+info()
+{
+	"get_${2:-$1}"
+
+	printf "\e[1;%dm${1}\e[0;0m${output}\n" $colour
+}
+
+printf "\e[33m"
+echo "   ,d                               "
+echo "   88                               "
+echo " MM88MMM 88       88 8b,     ,d8    "
+echo "   88    88       88  \`Y8, ,8P'    "
+echo "   88    88       88    )888(       "
+echo "   88,   \"8a,   ,a88  ,d8\" \"8b,  "
+echo "    Y888  \`\"YbbdP'Y8 8P'     \`Y8 "
+printf "\e[0m\n"
+
+info "OS name          ~ " osname
+info "Kernel           ~ " kernel
+info "Hostname         ~ " hostname
+info "Version          ~ " version
+info "Last update date ~ " last_update_date
+info "Uptime           ~ " uptime
+info "Terminals open   ~ " ptys
+info "Bootloader type  ~ " bootloader
+info "Cmdline          ~ " cmdline
