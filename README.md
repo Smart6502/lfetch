@@ -1,4 +1,6 @@
 <img src="lfetch.png" align="center">
-# lfetch
+<br>
+
+## lfetch
 
 Linux fetchy thingy for ur kernel
