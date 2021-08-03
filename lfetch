@@ -39,6 +39,13 @@ get_last_update_date()
 	output=$(echo $entry | awk '{print $3}')
 }
 
+get_compile_time()
+{
+	read -r version < /proc/sys/kernel/version
+	date="$(echo $version | cut -d " " -f5)-$(echo $version | cut -d " " -f6)-$(echo $version | cut -d " " -f7)"
+	output="$(echo $version | cut -d " " -f8) on ${date} [$(echo $version | cut -d " " -f9)]"
+}
+
 get_uptime()
 {
 	read -r seconds _ < /proc/uptime
@@ -49,6 +56,21 @@ get_uptime()
 	seconds=$((seconds % 60))
 
 	output="${hours} hours, ${minutes} minutes, ${seconds} seconds"
+}
+
+get_cpu_idle()
+{
+	read -r stats < /proc/stat
+
+	e0=$(echo $stats | cut -d " " -f2)
+	e1=$(echo $stats | cut -d " " -f3)
+	e2=$(echo $stats | cut -d " " -f4)
+	idle=$(echo $stats | cut -d " " -f5)
+	e4=$(echo $stats | cut -d " " -f6)
+	e5=$(echo $stats | cut -d " " -f7)
+	e6=$(echo $stats | cut -d " " -f8)
+
+	output="$(((idle * 100) / (e0 + e1 + e2 + idle + e4 + e5 + e6))) percent"
 }
 
 get_modules()
@@ -93,14 +115,16 @@ echo "    Y888  \`\"YbbdP'Y8 8P'     \`Y8 "
 printf "\e[0m\n"
 
 get_hostname
-printf "\e[34m${USER}\e[1;35m@${output}\n"
+printf "\e[34m${USER}\e[1;${colour}m@${output}\n"
 printf "\e[0m-------------------\n"
-info "OS name          ~ " osname
-info "Kernel           ~ " kernel
-info "Version          ~ " version
-info "Last update date ~ " last_update_date
-info "Uptime           ~ " uptime
-info "Modules          ~ " modules
-info "Terminals open   ~ " ptys
-info "Bootloader type  ~ " bootloader
-info "Cmdline          ~ " cmdline
+info "OS name           ~ " osname
+info "Kernel            ~ " kernel
+info "Version           ~ " version
+info "Last k.org update ~ " last_update_date
+info "Compile time      ~ " compile_time
+info "Uptime            ~ " uptime
+info "CPU idle          ~ " cpu_idle
+info "Modules           ~ " modules
+info "Terminals open    ~ " ptys
+info "Bootloader type   ~ " bootloader
+info "Cmdline           ~ " cmdline
