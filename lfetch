@@ -34,7 +34,7 @@ get_last_update_date()
 	get_version
 	version=$output
 
-	page=$(curl -s "https://mirrors.edge.kernel.org/pub/linux/kernel/v${version:0:1}.x/")
+	page=$(curl -s "https://mirrors.edge.kernel.org/pub/linux/kernel/v${version/.*}.x/")
 	entry=$(echo "$page" | grep $version | grep gz)
 	output=$(echo $entry | awk '{print $3}')
 }
@@ -92,9 +92,11 @@ echo "   88,   \"8a,   ,a88  ,d8\" \"8b,  "
 echo "    Y888  \`\"YbbdP'Y8 8P'     \`Y8 "
 printf "\e[0m\n"
 
+get_hostname
+printf "\e[34m${USER}\e[1;35m@${output}\n"
+printf "\e[0m-------------------\n"
 info "OS name          ~ " osname
 info "Kernel           ~ " kernel
-info "Hostname         ~ " hostname
 info "Version          ~ " version
 info "Last update date ~ " last_update_date
 info "Uptime           ~ " uptime
