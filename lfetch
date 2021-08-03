@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Linux fetch
+# Linux fetch (likely using bashismo)
 
 version=0.1.0
 
@@ -73,6 +73,12 @@ get_cpu_idle()
 	output="$(((idle * 100) / (e0 + e1 + e2 + idle + e4 + e5 + e6))) percent"
 }
 
+get_interrupts()
+{
+	output=$(cat /proc/interrupts | wc -l)
+	output=$(($output - 1))
+}
+
 get_modules()
 {
 	output=$(cat /proc/modules | wc -l)
@@ -104,15 +110,19 @@ info()
 	printf "\e[1;%dm${1}\e[0;0m${output}\n" $colour
 }
 
-printf "\e[33m"
-echo "   ,d                               "
-echo "   88                               "
-echo " MM88MMM 88       88 8b,     ,d8    "
-echo "   88    88       88  \`Y8, ,8P'    "
-echo "   88    88       88    )888(       "
-echo "   88,   \"8a,   ,a88  ,d8\" \"8b,  "
-echo "    Y888  \`\"YbbdP'Y8 8P'     \`Y8 "
-printf "\e[0m\n"
+printf "\e[1;33m"
+
+cat << "EOF"
+
+    .--.
+   |o_o |
+   |:_/ |
+  //   \ \
+ (|     | )
+/'\_   _/`\
+\___)=(___/
+
+EOF
 
 get_hostname
 printf "\e[34m${USER}\e[1;${colour}m@${output}\n"
@@ -124,6 +134,7 @@ info "Last k.org update ~ " last_update_date
 info "Compile time      ~ " compile_time
 info "Uptime            ~ " uptime
 info "CPU idle          ~ " cpu_idle
+info "Interrupts        ~ " interrupts
 info "Modules           ~ " modules
 info "Terminals open    ~ " ptys
 info "Bootloader type   ~ " bootloader
