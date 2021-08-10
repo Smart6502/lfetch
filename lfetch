@@ -70,6 +70,8 @@ get_uptime()
 
 get_cpu_idle()
 {
+    local stats e idle
+
 	read -r stats < /proc/stat
 
 	e=$(echo $stats | cut -d " " -f2)
@@ -77,7 +79,7 @@ get_cpu_idle()
 		e="$e + $(echo $stats | cut -d " " -f$i)"
 	done
 
-	echo "$(((idle * 100) / ($e))) percent"
+	echo "$((($(echo $stats | cut -d " " -f5) * 100) / ($e))) percent"
 }
 
 get_interrupts()
@@ -111,7 +113,7 @@ get_bootloader()
 
 info()
 {
-	printf "\e[1;%dm${1}\e[0;0m$("get_${2:-$1}")\n" $colour
+	printf "\e[1;%dm%s\e[0;0m%s\n" "$colour" "${1}" "$("get_${2:-$1}")"
 }
 
 loadcfg "/etc/lfetch.conf"
